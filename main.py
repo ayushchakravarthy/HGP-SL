@@ -9,6 +9,7 @@ from models import Model
 from torch.utils.data import random_split
 from torch_geometric.data import DataLoader
 from torch_geometric.datasets import TUDataset
+from nfnets import AGC
 
 parser = argparse.ArgumentParser()
 
@@ -27,6 +28,8 @@ parser.add_argument('--dataset', type=str, default='PROTEINS', help='DD/PROTEINS
 parser.add_argument('--device', type=str, default='cuda:0', help='specify cuda devices')
 parser.add_argument('--epochs', type=int, default=1000, help='maximum number of epochs')
 parser.add_argument('--patience', type=int, default=100, help='patience for early stopping')
+parser.add_argument('--optimizer', type=str, default='Adam', help='optimizer of choice')
+parser.add_argument('--clipping', type=float, default=1e-0, help='gradient clipping value')
 
 args = parser.parse_args()
 torch.manual_seed(args.seed)
@@ -50,8 +53,11 @@ val_loader = DataLoader(validation_set, batch_size=args.batch_size, shuffle=Fals
 test_loader = DataLoader(test_set, batch_size=args.batch_size, shuffle=False)
 
 model = Model(args).to(args.device)
-optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
-
+if args.optimizer == 'Adam':
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+elif args.optimizer == 'AGC':
+    optimizer = torch.optim.SGD(models.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+    optimizer = AGC(models.parameters(), optimizer, clipping=args.clipping)
 
 def train():
     min_loss = 1e10
