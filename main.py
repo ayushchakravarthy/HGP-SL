@@ -56,8 +56,8 @@ model = Model(args).to(args.device)
 if args.optimizer == 'Adam':
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 elif args.optimizer == 'AGC':
-    optimizer = torch.optim.SGD(models.parameters(), lr=args.lr, weight_decay=args.weight_decay)
-    optimizer = AGC(models.parameters(), optimizer, clipping=args.clipping)
+    optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+    optimizer = AGC(model.parameters(), optimizer, clipping=args.clipping)
 
 def train():
     min_loss = 1e10
