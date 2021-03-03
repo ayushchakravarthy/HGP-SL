@@ -30,6 +30,7 @@ parser.add_argument('--epochs', type=int, default=1000, help='maximum number of 
 parser.add_argument('--patience', type=int, default=100, help='patience for early stopping')
 parser.add_argument('--optimizer', type=str, default='Adam', help='optimizer of choice')
 parser.add_argument('--clipping', type=float, default=1e-0, help='gradient clipping value')
+parser.add_argument('--eps', type=float, default=1e-1, help='gradient clipping epsilon value')
 
 args = parser.parse_args()
 torch.manual_seed(args.seed)
@@ -57,7 +58,7 @@ if args.optimizer == 'Adam':
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 elif args.optimizer == 'AGC':
     optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
-    optimizer = AGC(model.parameters(), optimizer, clipping=args.clipping)
+    optimizer = AGC(model.parameters(), optimizer, clipping=args.clipping, eps=args.eps, model=model, ignore_agc=[''])
 
 def train():
     min_loss = 1e10
